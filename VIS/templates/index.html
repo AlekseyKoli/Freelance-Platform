@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Freelance Platform</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+
+
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <div class="container">
+        <a class="navbar-brand" href="/">Freelance Platform</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto" id="navbarLinks">
+                <li class="nav-item">
+                    <a class="nav-link" href="/">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/projects">Projects</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/freelancers">Freelancers</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/about">About</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/contact">Contact</a>
+                </li>
+                <li class="nav-item">
+                    <a class="btn btn-primary" href="/signup">Sign Up</a>
+                </li>
+            </ul>
+            
+        </div>
+    </div>
+</nav>
+
+
+<section class="bg-primary text-white text-center py-5">
+    <div class="container">
+        <h1>Find the Best Freelancers for Your Project</h1>
+        <p class="lead">Connect with top professionals to bring your ideas to life</p>
+        <a href="/signup" class="btn btn-light mt-3">Get Started</a>
+    </div>
+</section>
+
+
+<section class="py-5">
+    <div class="container">
+        <div class="row text-center">
+            <div class="col-md-4">
+                <div class="card p-3">
+                    <h4>Wide Selection of Skills</h4>
+                    <p>Find experts in web development, graphic design, marketing, and more.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card p-3">
+                    <h4>Secure Payments</h4>
+                    <p>Pay safely through our platform with secure transactions.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card p-3">
+                    <h4>Easy Collaboration</h4>
+                    <p>Communicate and track project progress easily with built-in tools.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+<section class="bg-dark text-white text-center py-5">
+    <div class="container">
+        <h2>Ready to start your project?</h2>
+        <a href="/signup" class="btn btn-primary mt-3">Sign Up Now</a>
+    </div>
+</section>
+
+
+<footer class="bg-light text-center py-4">
+    <div class="container">
+        <p class="mb-0">&copy; 2024 Freelance Platform. All rights reserved.</p>
+        <a href="#" class="text-secondary">Privacy Policy</a> | <a href="#" class="text-secondary">Terms of Service</a>
+    </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+
+async function updateNavbar() {
+        try {
+            const response = await fetch('http://127.0.0.1:5000/api/current-user');
+            const data = await response.json();
+            const navbarLinks = document.getElementById('navbarLinks');
+
+            if (data.logged_in) {
+                navbarLinks.innerHTML = `
+                <li class="nav-item"><a class="nav-link" href="/">Home</a></li>
+                <li class="nav-item"><a class="nav-link" href="/projects">Projects</a></li>
+                <li class="nav-item"><a class="nav-link" href="/freelancers">Freelancers</a></li>
+                <li class="nav-item"><a class="nav-link" href="/about">About</a></li>
+                <li class="nav-item"><a class="nav-link" href="/contact">Contact</a></li>
+                <li class="nav-item"><a class="btn btn-danger" id="logoutButton">Log Out</a></li>
+                `;
+                document.getElementById('logoutButton').addEventListener('click', async () => {
+                    await fetch('http://127.0.0.1:5000/logout', { method: 'POST' });
+                    window.location.href = '/';
+                });
+            } else {
+                navbarLinks.innerHTML = `
+                    <li class="nav-item"><a class="nav-link" href="/">Home</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/projects">Projects</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/freelancers">Freelancers</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/about">About</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/contact">Contact</a></li>
+                    <li class="nav-item"><a class="btn btn-primary" href="/signup">Sign Up</a></li>
+                `;
+            }
+        } catch (error) {
+            console.error('Error updating navbar:', error);
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', updateNavbar);
+</script>
+</body>
+</html>

@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project Profile - Freelance Platform</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <div class="container">
+        <a class="navbar-brand" href="/">Freelance Platform</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto" id="navbarLinks">
+                <li class="nav-item">
+                    <a class="nav-link" href="/">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/projects">Projects</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/freelancers">Freelancers</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/about">About</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/contact">Contact</a>
+                </li>
+                <li class="nav-item">
+                    <a class="btn btn-primary" href="/signup">Sign Up</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<section class="py-5">
+    <div class="container">
+        <h2 class="text-center mb-4" id="projectTitle">Project Title</h2>
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card p-4">
+                    <h4 class="mb-3">Project Description</h4>
+                    <p id="projectDescription">Loading project description...</p>
+                    <h5 class="mt-4">Budget</h5>
+                    <p id="projectBudget">Loading budget...</p>
+                    <h5 class="mt-4">Skills Required</h5>
+                    <p id="projectSkills">Loading required skills...</p>
+                    <button id="applyBtn" onclick="applyForProject()" class="btn btn-primary w-100 mt-4">Apply to This Project</button>
+                </div>
+            </div>
+        </div>
+        <!-- Modal for application -->
+<div class="modal fade" id="applyModal" tabindex="-1" aria-labelledby="applyModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="applyModalLabel">Fill in your application</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="applicationForm">
+                    <div class="mb-3">
+                        <label for="applicantName" class="form-label">Your Name</label>
+                        <input type="text" class="form-control" id="applicantName" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="applicantMessage" class="form-label">Message</label>
+                        <textarea class="form-control" id="applicantMessage" rows="3" required></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label for="applicantFile" class="form-label">Attach a file</label>
+                        <input type="file" class="form-control" id="applicantFile" accept="image/*">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="submitApplication()">Submit Application</button>
+            </div>
+        </div>
+    </div>
+</div>
+        <ul id="applicationsList">
+            <!-- Заявки будут динамически загружаться сюда -->
+
+        </ul>
+        </div>
+    </div>
+</section>
+
+<footer class="bg-light text-center py-4">
+    <div class="container">
+        <p class="mb-0">&copy; 2024 Freelance Platform. All rights reserved.</p>
+        <a href="#" class="text-secondary">Privacy Policy</a> | <a href="#" class="text-secondary">Terms of Service</a>
+    </div>
+</footer>
+<script>
+    function applyForProject() {
+        const applyModal = new bootstrap.Modal(document.getElementById('applyModal'));
+        applyModal.show();
+    }
+
+    function getProjectId() {
+    const urlParams = new URLSearchParams(window.location.search);
+    return urlParams.get('id');
+}
+async function getFreelancerId() {
+    try {
+        const response = await fetch('/api/current-user');
+        const data = await response.json();
+
+        if (data.logged_in) {
+            return data.user.id;  // Get the user ID
+        } else {
+            window.location.href = '/login'; // Redirect to login
+            return null;
+        }
+    } catch (error) {
+        console.error('Error fetching freelancer ID:', error);
+        alert('Please log in to submit an application.');
+        window.location.href = '/login'; // Redirect to login
+        return null;
+    }
+}
+
+async function submitApplication() {
+    const projectId = getProjectId();  // Получаем projectId из URL
+    const freelancerId = await getFreelancerId();  // Получаем freelancerId через API
+    if (!freelancerId) {
+        alert('You must be logged in to submit an application.');
+        return;
+    }
+
+    const proposal = document.getElementById('applicantMessage').value;
+    const profilePicture = document.getElementById('profilePicture').value;  // URL или путь к файлу
+
+    if (!proposal) {
+        alert('Please fill in all required fields.');
+        return;
+    }
+
+    const applicationData = {
+        project_id: projectId,
+        freelancer_id: freelancerId,
+        proposal: proposal,
+        profile_picture: profilePicture
+    };
+
+    try {
+        const response = await fetch('/api/submit-application', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(applicationData)
+        });
+
+        if (response.ok) {
+            alert('Your application has been successfully submitted!');
+            document.getElementById('applicationForm').reset();
+        } else {
+            alert('An error occurred while submitting your application.');
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Failed to submit your application.');
+    }
+}
+
+</script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+async function loadProjectDetails() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const projectId = urlParams.get('id');
+
+    try {
+        const response = await fetch(`http://127.0.0.1:5000/api/projects/${projectId}`);
+        if (!response.ok) throw new Error('Failed to load project details.');
+
+        const project = await response.json();
+
+        // Вставляем данные проекта в существующие элементы
+        document.getElementById('projectTitle').textContent = project.title;
+        document.getElementById('projectDescription').textContent = project.description;
+        document.getElementById('projectBudget').textContent = project.budget;
+        document.getElementById('projectSkills').textContent = project.required_skills.join(', ');
+    } catch (error) {
+        console.error('Error loading project details:', error);
+    }
+}
+    document.addEventListener('DOMContentLoaded', loadProjectDetails);
+
+    
+    async function loadApplications(projectId) {
+    try {
+        const response = await fetch(`/api/projects/${projectId}/applications`);
+        const applications = await response.json();
+        const applicationsList = document.getElementById('applicationsList');
+
+        // Очистим текущий список и добавим новые заявки
+        applicationsList.innerHTML = '';
+        applications.forEach(application => {
+            const li = document.createElement('li');
+            li.textContent = `${application.freelancer_name}: ${application.proposal}`;
+            applicationsList.appendChild(li);
+
+            if (application.profile_picture) {
+                const img = document.createElement('img');
+                img.src = application.profile_picture;
+                img.alt = 'Profile picture';
+                img.width = 50;  // Примерный размер
+                li.appendChild(img);
+            }
+        });
+    } catch (error) {
+        console.error('Error loading applications:', error);
+    }
+}
+
+
+    async function updateNavbar() {
+        try {
+            const response = await fetch('http://127.0.0.1:5000/api/current-user');
+            const data = await response.json();
+            const navbarLinks = document.getElementById('navbarLinks');
+
+            if (data.logged_in) {
+                navbarLinks.innerHTML = `
+                <li class="nav-item"><a class="nav-link" href="/">Home</a></li>
+                <li class="nav-item"><a class="nav-link" href="/projects">Projects</a></li>
+                <li class="nav-item"><a class="nav-link" href="/freelancers">Freelancers</a></li>
+                <li class="nav-item"><a class="nav-link" href="/about">About</a></li>
+                <li class="nav-item"><a class="nav-link" href="/contact">Contact</a></li>
+                <li class="nav-item"><a class="btn btn-danger" id="logoutButton">Log Out</a></li>
+                `;
+                document.getElementById('logoutButton').addEventListener('click', async () => {
+                    await fetch('http://127.0.0.1:5000/logout', { method: 'POST' });
+                    window.location.href = '/';
+                });
+            } else {
+                navbarLinks.innerHTML = `
+                    <li class="nav-item"><a class="nav-link" href="/">Home</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/projects">Projects</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/freelancers">Freelancers</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/about">About</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/contact">Contact</a></li>
+                    <li class="nav-item"><a class="btn btn-primary" href="/signup">Sign Up</a></li>
+                `;
+            }
+        } catch (error) {
+            console.error('Error updating navbar:', error);
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', updateNavbar);
+</script>
+</body>
+</html>

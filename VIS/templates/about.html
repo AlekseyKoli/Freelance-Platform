@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About - Freelance Platform</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <div class="container">
+        <a class="navbar-brand" href="/">Freelance Platform</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto" id="navbarLinks">
+                <li class="nav-item">
+                    <a class="nav-link" href="/">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/projects">Projects</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/freelancers">Freelancers</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/about">About</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/contact">Contact</a>
+                </li>
+                <li class="nav-item">
+                    <a class="btn btn-primary" href="/signup">Sign Up</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<section class="py-5">
+    <div class="container">
+        <h2 class="text-center mb-4">About Us</h2>
+        <div class="row">
+            <div class="col-md-6">
+                <img src="https://assets.entrepreneur.com/content/3x2/2000/20151117183622-small-business-woman-desk-office.jpeg" class="img-fluid rounded mb-4" alt="About Us">
+            </div>
+            <div class="col-md-6">
+                <p>
+                    We are a leading platform connecting freelancers with clients across various industries.
+                    Our mission is to create a seamless experience for businesses and professionals to collaborate and bring projects to life.
+                </p>
+                <p>
+                    Whether you're a seasoned freelancer or a company looking for top talent, our platform provides the tools and resources needed to succeed.
+                </p>
+                <p>
+                    Join us and become part of a global network dedicated to innovation, creativity, and success.
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<footer class="bg-light text-center py-4">
+    <div class="container">
+        <p class="mb-0">&copy; 2024 Freelance Platform. All rights reserved.</p>
+        <a href="#" class="text-secondary">Privacy Policy</a> | <a href="#" class="text-secondary">Terms of Service</a>
+    </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    async function updateNavbar() {
+        try {
+            const response = await fetch('http://127.0.0.1:5000/api/current-user');
+            const data = await response.json();
+            const navbarLinks = document.getElementById('navbarLinks');
+
+            if (data.logged_in) {
+                navbarLinks.innerHTML = `
+                <li class="nav-item"><a class="nav-link" href="/">Home</a></li>
+                <li class="nav-item"><a class="nav-link" href="/projects">Projects</a></li>
+                <li class="nav-item"><a class="nav-link" href="/freelancers">Freelancers</a></li>
+                <li class="nav-item"><a class="nav-link" href="/about">About</a></li>
+                <li class="nav-item"><a class="nav-link" href="/contact">Contact</a></li>
+                <li class="nav-item"><a class="btn btn-danger" id="logoutButton">Log Out</a></li>
+                `;
+                document.getElementById('logoutButton').addEventListener('click', async () => {
+                    await fetch('http://127.0.0.1:5000/logout', { method: 'POST' });
+                    window.location.href = '/';
+                });
+            } else {
+                navbarLinks.innerHTML = `
+                    <li class="nav-item"><a class="nav-link" href="/">Home</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/projects">Projects</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/freelancers">Freelancers</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/about">About</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/contact">Contact</a></li>
+                    <li class="nav-item"><a class="btn btn-primary" href="/signup">Sign Up</a></li>
+                `;
+            }
+        } catch (error) {
+            console.error('Error updating navbar:', error);
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', updateNavbar);
+
+</script>
+</body>
+</html>
